@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 from duckdb import DuckDBPyRelation
 from pandas import DataFrame
 
+load_dotenv()
+
 
 def download_google_drive(url_pasta, diretorio_local):
     os.makedirs(diretorio_local, exist_ok = True)
@@ -25,7 +27,7 @@ def listar_arquivos_csv(diretorio):
 
 def ler_csv(caminho_do_arquivo):
     dataframe_duckdb = duckdb.read_csv(caminho_do_arquivo)
-    print(dataframe_duckdb)
+    #print(dataframe_duckdb)
     return dataframe_duckdb
 
 def transformar(df: DuckDBPyRelation) -> DataFrame:
@@ -42,5 +44,11 @@ if __name__ == "__main__":
     url_pasta = 'https://drive.google.com/drive/folders/1D10FBl0V7qrz4TMGPefM2zSnuPE9AzpM'
     diretorio_local = './pasta_gdown'
     #download_google_drive(url_pasta, diretorio_local)
-    arquivos = listar_arquivos_csv(diretorio_local)
-    ler_csv(arquivos)
+    lista_de_arquivos = listar_arquivos_csv(diretorio_local)
+
+    for caminho_do_arquivo in lista_de_arquivos:
+        duck_db_df = ler_csv(caminho_do_arquivo)
+        pandas_df_transformado = transformar(duck_db_df)
+        salvar_no_postgres(pandas_df_transformado,"vendas_calculado")
+
+
